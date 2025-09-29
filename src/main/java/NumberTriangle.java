@@ -107,24 +107,43 @@ public class NumberTriangle {
         // open the file and get a BufferedReader object whose methods
         // are more convenient to work with when reading the file contents.
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
+        if (inputStream == null) {
+            throw new FileNotFoundException("Could not find resource on classpath: " + fname);
+        }
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
-
-        // TODO define any variables that you want to use to store things
 
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
         NumberTriangle top = null;
+        java.util.List<NumberTriangle> prevRow = null;
 
         String line = br.readLine();
         while (line != null) {
+            line = line.trim();
+            if (!line.isEmpty()) {
+                String[] parts = line.split("\\s+");
+                java.util.List<NumberTriangle> currRow = new java.util.ArrayList<>();
 
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
+                for (String p : parts) {
+                    currRow.add(new NumberTriangle(Integer.parseInt(p)));
+                }
 
-            // TODO process the line
+                if (top == null) {
+                    top = currRow.get(0);
+                }
 
-            //read the next line
+                if (prevRow != null) {
+                    for (int j = 0; j < prevRow.size(); j++) {
+                        prevRow.get(j).setLeft(currRow.get(j));
+                        prevRow.get(j).setRight(currRow.get(j + 1));
+                    }
+                }
+
+                // advance rows
+                prevRow = currRow;
+            }
+
+            // read the next line (must be outside the if-block)
             line = br.readLine();
         }
         br.close();
